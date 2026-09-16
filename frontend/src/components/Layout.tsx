@@ -152,6 +152,32 @@ export default function Layout({ children }: LayoutProps) {
           font-size: 0.875rem;
         }
 
+        .navbar-link {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          height: 42px;
+          padding: 0 0.75rem;
+          border: 1px solid var(--border);
+          border-radius: 0.5rem;
+          background: var(--background);
+          color: var(--text);
+          font-size: 0.875rem;
+          text-decoration: none;
+          transition: all 0.2s;
+        }
+
+        .navbar-link:hover {
+          border-color: var(--primary);
+          text-decoration: none;
+        }
+
+        .navbar-link svg {
+          width: 16px;
+          height: 16px;
+          color: var(--text-muted);
+        }
+
         .theme-toggle {
           background: var(--background);
           border: 1px solid var(--border);
@@ -288,7 +314,7 @@ export default function Layout({ children }: LayoutProps) {
         }
 
         @media (max-width: 640px) {
-          .navbar-email, .user-dropdown-email {
+          .navbar-email, .user-dropdown-email, .navbar-link-text {
             display: none;
           }
         }
@@ -307,6 +333,15 @@ export default function Layout({ children }: LayoutProps) {
           </Link>
 
           <div className="navbar-user">
+            {user && (
+              <Link to="/search" className="navbar-link" title="Compare prices across stores">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="7" cy="7" r="5" />
+                  <path d="M13 13L11 11" />
+                </svg>
+                <span className="navbar-link-text">Compare</span>
+              </Link>
+            )}
             <button
               className="theme-toggle"
               onClick={toggleTheme}

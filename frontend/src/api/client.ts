@@ -120,12 +120,13 @@ export const productsApi = {
 
   getById: (id: number) => api.get<ProductWithStats>(`/products/${id}`),
 
-  create: (url: string, refreshInterval?: number, selectedPrice?: number, selectedMethod?: string) =>
+  create: (url: string, refreshInterval?: number, selectedPrice?: number, selectedMethod?: string, selectedCurrency?: string) =>
     api.post<CreateProductResponse>('/products', {
       url,
       refresh_interval: refreshInterval,
       selectedPrice,
       selectedMethod,
+      selectedCurrency,
     }),
 
   update: (id: number, data: {
@@ -156,6 +157,101 @@ export const pricesApi = {
     api.post<{ message: string; price: PriceHistory }>(
       `/products/${productId}/refresh`
     ),
+};
+
+// Store Search API
+export interface SearchRegion {
+  code: string;
+  name: string;
+}
+
+export interface SearchStore {
+  id: string;
+  name: string;
+  homepage: string;
+  regions: string[];
+  currency: string;
+}
+
+export interface SearchOffer {
+  storeId: string;
+  storeName: string;
+  title: string;
+  url: string;
+  imageUrl: string | null;
+  price: number;
+  currency: string;
+  stockStatus: StockStatus;
+  brand: string | null;
+  sku: string | null;
+  gtin: string | null;
+  condition: 'new' | 'refurbished';
+  relevance: number;
+}
+
+export interface StoreSearchResult {
+  storeId: string;
+  storeName: string;
+  status: 'ok' | 'error';
+  offers: SearchOffer[];
+  error?: string;
+  durationMs: number;
+  cached: boolean;
+}
+
+export type SearchEvent =
+  | { type: 'start'; stores: { id: string; name: string }[] }
+  | { type: 'store'; result: StoreSearchResult }
+  | { type: 'done'; durationMs: number }
+  | { type: 'error'; error: string };
+
+export const searchApi = {
+  getStores: () => api.get<{ regions: SearchRegion[]; stores: SearchStore[] }>('/search/stores'),
+
+  // Uses fetch rather than axios because results are streamed as newline-delimited JSON
+  search: async (
+    query: string,
+    storeIds: string[],
+    onEvent: (event: SearchEvent) => void,
+    signal?: AbortSignal
+  ) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ query, storeIds }),
+      signal,
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+      return;
+    }
+    if (!response.ok || !response.body) {
+      const body = await response.json().catch(() => null);
+      throw new Error(body?.error || 'Search failed');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+      for (const line of lines) {
+        if (line.trim()) onEvent(JSON.parse(line) as SearchEvent);
+      }
+    }
+    if (buffer.trim()) onEvent(JSON.parse(buffer) as SearchEvent);
+  },
 };
 
 // Stock Status History API

@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import ProductDetail from './pages/ProductDetail';
 import Settings from './pages/Settings';
 import NotificationHistory from './pages/NotificationHistory';
+import Search from './pages/Search';
 
 function ThemeInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -109,6 +110,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/search"
+        element={
+          <ProtectedRoute>
+            <Search />
           </ProtectedRoute>
         }
       />
