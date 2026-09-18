@@ -5,6 +5,26 @@ All notable changes to PriceGhost will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Multi-Store Price Comparison** - New "Compare" page to search for a product across stores
+  - Results stream in per store as they arrive; sort by price, match or store
+  - Filters for price range, in-stock only, partial matches and refurbished listings
+  - Highlights the best in-stock price; "Track" starts tracking an offer with the usual price review
+  - Built-in stores: Worten, Radio Popular, Globaldata, Continente, Castro Electrónica (Portugal) and Amazon.es (Spain/Portugal)
+  - Stores are configuration entries with regions: schema.org JSON-LD/microdata, CSS selectors or Doofinder
+  - Falls back to a shared headless browser for stores behind bot protection
+  - Results are cached for 10 minutes
+  - Relevance ranking demotes accessories ("Capa iPhone 15") and other model variants ("Galaxy S24 FE")
+
+### Fixed
+
+- Prices confirmed in the price selection modal were always recorded in USD; the selected currency is now stored
+
+---
+
 ## [1.0.6] - 2026-01-26
 
 ### Added

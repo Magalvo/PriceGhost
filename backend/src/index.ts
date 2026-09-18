@@ -9,6 +9,7 @@ import settingsRoutes from './routes/settings';
 import profileRoutes from './routes/profile';
 import adminRoutes from './routes/admin';
 import notificationRoutes from './routes/notifications';
+import searchRoutes from './routes/search';
 import { startScheduler } from './services/scheduler';
 import pool from './config/database';
 
@@ -272,6 +273,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/search', searchRoutes);
 
 // Error handling middleware
 app.use(
