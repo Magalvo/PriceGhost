@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Prices confirmed in the price selection modal were always recorded in USD; the selected currency is now stored
+- Headless Chromium failed to launch in the Docker image ("chrome_crashpad_handler: --database is required"), breaking browser-based scraping; the container user now has a home directory
 
 ---
 

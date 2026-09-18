@@ -57,8 +57,9 @@ RUN npm install --omit=dev
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
 
-# Create non-root user
-RUN groupadd -r nodejs && useradd -r -g nodejs nodejs
+# Create non-root user. Chromium needs a writable home directory: its crashpad handler keeps
+# its database under ~/.config and fails to launch without it ("--database is required")
+RUN groupadd -r nodejs && useradd -r -m -g nodejs nodejs
 
 # Change ownership of app directory
 RUN chown -R nodejs:nodejs /app
